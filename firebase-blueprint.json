@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User registration data for cross-device login",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "password": { "type": "string" }
+      },
+      "required": ["name", "email", "password"]
+    },
+    "UserData": {
+      "title": "AppData",
+      "description": "User application state (tasks, habits, notes)",
+      "type": "object",
+      "properties": {
+        "tasks": { 
+          "type": "array",
+          "items": { "$ref": "Task" }
+        },
+        "habits": { 
+          "type": "array",
+          "items": { "$ref": "Habit" }
+        },
+        "notes": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Task": {
+      "title": "Task",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "date": { "type": "string" }
+      }
+    },
+    "Habit": {
+      "title": "Habit",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "completedDates": { 
+          "type": "array", 
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "users/{email}": {
+      "schema": "User",
+      "description": "Stored users for login"
+    },
+    "user_data/{email}": {
+      "schema": "UserData",
+      "description": "User application state sync"
+    }
+  }
+}

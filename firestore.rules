@@ -1,12 +1,28 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Usuários: leitura individual (necessária para login/verificação de duplicidade
+    // enquanto o app não usa Firebase Auth). Listagem e delete bloqueados.
+    // Para segurança real, migrar para Firebase Authentication e validar request.auth.
     match /users/{email} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.email == email
+                    && request.resource.data.password is string
+                    && request.resource.data.password.size() == 64;
+      allow update: if request.resource.data.email == email
+                    && request.resource.data.password is string
+                    && request.resource.data.password.size() == 64;
+      allow delete: if false;
     }
+
     match /user_data/{email} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if true;
+      allow delete: if false;
     }
+
     match /{document=**} {
       allow read, write: if false;
     }

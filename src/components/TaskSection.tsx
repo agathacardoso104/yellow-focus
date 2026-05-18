@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Plus, Trash2, Edit3, CheckCircle2, Circle, X } from 'lucide-react';
+import { Plus, Trash2, Edit3, CheckCircle2, Circle } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 

@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { 
-  format, 
-  addMonths, 
-  subMonths, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  eachDayOfInterval, 
-  isSameMonth, 
-  isSameDay, 
-  addWeeks, 
+import {
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addWeeks,
   subWeeks,
-  startOfDay,
-  parseISO
+  addDays,
+  subDays,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { ptBR } from 'date-fns/locale';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -49,12 +49,13 @@ export const CalendarView = ({
   const next = () => {
     if (view === 'month') setCurrentMonth(addMonths(currentMonth, 1));
     if (view === 'week') onDateSelect(addWeeks(selectedDate, 1));
-    if (view === 'day') onDateSelect(addWeeks(selectedDate, 1 / 7)); // wait addDays...
+    if (view === 'day') onDateSelect(addDays(selectedDate, 1));
   };
 
   const prev = () => {
     if (view === 'month') setCurrentMonth(subMonths(currentMonth, 1));
     if (view === 'week') onDateSelect(subWeeks(selectedDate, 1));
+    if (view === 'day') onDateSelect(subDays(selectedDate, 1));
   };
 
   return (

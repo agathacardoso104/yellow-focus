@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Coffee, Zap } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 
 export const PomodoroTimer = () => {
   const [timeLeft, setTimeLeft] = useState(30 * 60);

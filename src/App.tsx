@@ -10,19 +10,15 @@ import { TaskSection } from './components/TaskSection';
 import { HabitTracker } from './components/HabitTracker';
 import { PomodoroTimer } from './components/PomodoroTimer';
 import { NotesArea } from './components/NotesArea';
-import { 
-  LayoutDashboard, 
-  Calendar as CalendarIcon, 
-  CheckSquare, 
-  Activity, 
-  Timer, 
-  Menu, 
-  X,
+import {
+  LayoutDashboard,
+  Calendar as CalendarIcon,
+  CheckSquare,
+  Activity,
+  Timer,
+  Menu,
   Target,
-  Sun,
-  LogIn,
   LogOut,
-  User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';

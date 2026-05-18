@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { syncService } from '../services/syncService';
 
+async function hashPassword(email: string, password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`${email.toLowerCase()}:${password}:yellow-focus-salt-v1`);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 export interface Task {
   id: string;
   text: string;
@@ -38,8 +47,8 @@ const AppContext = createContext<{
   deleteHabit: (id: string) => void;
   updateHabit: (id: string, name: string) => void;
   updateNotes: (text: string) => void;
-  login: (email: string, password: string, remember: boolean) => { success: boolean; message: string };
-  register: (user: User) => { success: boolean; message: string };
+  login: (email: string, password: string, remember: boolean) => Promise<{ success: boolean; message: string }>;
+  register: (user: User) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 } | undefined>(undefined);
 
@@ -172,21 +181,20 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     setState(prev => ({ ...prev, notes }));
   };
 
-  const login = async (email: string, password: string, remember: boolean) => {
-    // 1. Tenta local primeiro
+  const login = async (email: string, password: string, _remember: boolean) => {
+    const passwordHash = await hashPassword(email, password);
+
     const users = getRegisteredUsers();
-    let user = users.find(u => u.email === email && u.password === password);
-    
-    // 2. Se não estiver local (novo aparelho), tenta buscar na nuvem
+    let user = users.find(u => u.email === email && u.password === passwordHash);
+
     if (!user) {
       const cloudUser = await syncService.findUserLocallyOrCloud(email);
-      if (cloudUser && cloudUser.password === password) {
+      if (cloudUser && cloudUser.password === passwordHash) {
         user = cloudUser;
-        // Salva local para agilizar o próximo login
         saveUserToDB(user);
       }
     }
-    
+
     if (user) {
       const publicUser = { name: user.name, email: user.email };
       setState(prev => ({ ...prev, user: publicUser }));
@@ -196,16 +204,18 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const register = async (user: User) => {
-    // Verifica se já existe local ou na nuvem
     const users = getRegisteredUsers();
     const cloudUser = await syncService.findUserLocallyOrCloud(user.email);
-    
+
     if (users.find(u => u.email === user.email) || cloudUser) {
       return { success: false, message: "Este e-mail já está cadastrado." };
     }
 
-    saveUserToDB(user);
-    await syncService.registerUserCloud(user); // Salva na nuvem para outros aparelhos
+    const passwordHash = await hashPassword(user.email, user.password ?? '');
+    const stored: User = { name: user.name, email: user.email, password: passwordHash };
+
+    saveUserToDB(stored);
+    await syncService.registerUserCloud(stored);
 
     return { success: true, message: "Cadastro realizado com sucesso! Faça login." };
   };

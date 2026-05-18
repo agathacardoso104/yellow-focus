@@ -1,20 +1,57 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Yellow Focus
 
-# Run and deploy your AI Studio app
+App de produtividade pessoal (tarefas, hábitos, pomodoro e notas) construído com React + TypeScript + Vite + Tailwind v4, com persistência em Firebase Firestore e fallback em localStorage.
 
-This contains everything you need to run your app locally.
+## Rodando localmente
 
-View your app in AI Studio: https://ai.studio/apps/921c87fd-1edd-4091-8ea5-70f6789d6afe
+**Pré-requisitos:** Node.js 18+
 
-## Run Locally
+1. Instalar dependências:
+   ```
+   npm install
+   ```
 
-**Prerequisites:**  Node.js
+2. (Opcional) Sobrescrever a configuração do Firebase via variáveis de ambiente — crie um arquivo `.env.local` na raiz:
+   ```
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
+   VITE_FIREBASE_DATABASE_ID=...
+   ```
+   Se não informar, usa o `firebase-applet-config.json`.
 
+3. Rodar em modo dev:
+   ```
+   npm run dev
+   ```
+   Acesse http://localhost:3000
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Scripts
+
+- `npm run dev` — servidor de desenvolvimento Vite
+- `npm run build` — build de produção em `dist/`
+- `npm run preview` — preview do build
+- `npm run lint` — checagem de tipos TypeScript
+- `npm run clean` — remove `dist/`
+
+## Estrutura
+
+```
+src/
+  components/   → CalendarView, TaskSection, HabitTracker, PomodoroTimer, NotesArea
+  context/      → AppContext (estado global + auth)
+  services/     → syncService (Firestore)
+  lib/          → firebase (init)
+```
+
+## Deploy
+
+Configurado para Vercel (ver `vercel.json`). Suba o repositório e configure as variáveis `VITE_FIREBASE_*` no painel do Vercel.
+
+## Notas de segurança
+
+- A autenticação atual é caseira: senhas são hasheadas com SHA-256 + salt antes de ir para o Firestore, mas o ideal é migrar para **Firebase Authentication** para ter MFA, recuperação de senha, sessões seguras e regras `request.auth`.
+- As regras em `firestore.rules` foram apertadas (sem `list`/`delete`), mas ainda permitem leitura por email — para segurança completa é preciso passar a usar `request.auth.uid` após migrar para Firebase Auth.
